@@ -7,7 +7,7 @@ module {
 };
 
 
-def cross($left_values; $right_values):
+def cross_join($left_values; $right_values):
     # Performs a SQL-style cross join (i.e. cartesian product) between
     # $left_values and $right_values.
     # 
@@ -23,10 +23,10 @@ def cross($left_values; $right_values):
         }
     ] ;
 
-def cross($right_values):
+def cross_join($right_values):
     # Equivalent to `. as $left_values | cross($left_values; $right_values)`.
     . as $left_values
-    | cross($left_values; $right_values)
+    | cross_join($left_values; $right_values)
     ;
 
 
