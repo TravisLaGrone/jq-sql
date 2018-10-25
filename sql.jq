@@ -1,7 +1,6 @@
 module {
     "name": "sql",
-    "description": "SQL-like operators for jq, written in jq",
-    "homepage": "https://gist.github.com/tlagrone/5006ac1a816e0c8d9cccd23abd04a3c5",
+    "description": "SQL-like operations (e.g. joins)",
     "author": "Travis C. LaGrone",
     "email": "travis.lagrone@trintech.com",
     "company": "Trintech"
