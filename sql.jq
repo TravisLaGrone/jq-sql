@@ -68,7 +68,7 @@ def cogroup($right_entries):
     ;
 
 
-def outerjoin($left_entries; $right_entries):
+def full_join($left_entries; $right_entries):
     # Performs a SQL-style full outer join between $left_entries and $right_entries
     # on <left-entry>.key == <right-entry>.key.
     # 
@@ -102,14 +102,14 @@ def outerjoin($left_entries; $right_entries):
         end
     ) ;
 
-def outerjoin($right_entries):
-    # Equivalent to `. as $left_entries | outerjoin($left_entries; $right_entries)`.
+def full_join($right_entries):
+    # Equivalent to `. as $left_entries | full_join($left_entries; $right_entries)`.
     . as $left_entries
-    | outerjoin($left_entries; $right_entries)
+    | full_join($left_entries; $right_entries)
     ;
 
 
-def disjoin($left_entries; $right_entries):
+def full_antijoin($left_entries; $right_entries):
     # Performs a SQL-style disjunctive outer join between $left_entries and
     # $right_entries on <left-entry>.key == <right-entry>.key.
     # 
@@ -134,20 +134,20 @@ def disjoin($left_entries; $right_entries):
     #         { "key": <key>, "left": <left-value> },
     #         { "key": <key>, "right": <right-value> }
     #     )* ]
-    outerjoin($left_entries; $right_entries)
+    full_join($left_entries; $right_entries)
     | map(select(
             (has("left") and has("right"))
             | not
     )) ;
 
-def disjoin($right_entries):
-    # Equivalent `. as $left_entries | disjoin($left_entries; $right_entries)`.
+def full_antijoin($right_entries):
+    # Equivalent `. as $left_entries | outer_antijoin($left_entries; $right_entries)`.
     . as $left_entries
-    | disjoin($left_entries; $right_entries)
+    | outer_antijoin($left_entries; $right_entries)
     ;
 
 
-def leftjoin($left_entries; $right_entries):
+def left_join($left_entries; $right_entries):
     # Performs a SQL-style left outer join between $left_entries and $right_entries
     # on <left-entry>.key == <right-entry>.key.
     # 
@@ -160,38 +160,18 @@ def leftjoin($left_entries; $right_entries):
     #         { "key": <key>, "left": <left-value> },
     #         { "key": <key>, "left": <left-value>, "right": <right-value> }
     #     )* ]
-    outerjoin($left_entries; $right_entries)
+    full_join($left_entries; $right_entries)
     | map(select(.left != null))
     ;
 
-def leftjoin($right_entries):
-    # Equivalent to `. as $left_entries | leftjoin($left_entries; $right_entries)`.
+def left_join($right_entries):
+    # Equivalent to `. as $left_entries | left_join($left_entries; $right_entries)`.
     . as $left_entries
-    | leftjoin($left_entries; $right_entries)
+    | left_join($left_entries; $right_entries)
     ;
 
 
-def innerjoin($left_entries; $right_entries):
-    # Performs a SQL-style inner join between $left_entries and $right_entries
-    # on <left-entry>.key == <right-entry>.key.
-    # 
-    # Uses `null == null` as in jq, *not* `NULL <> NULL` as in SQL.
-    # 
-    # :param $left_entries:  [ { "key": <left-key>, "value": <left-value> }* ]
-    # :param $right_entries:  [ { "key": <right-key>, "value": <right-value> }* ]
-    # :output:  [ { "key": <key>, "left": <left-value>, "right": <right-value> }* ]
-    outerjoin($left_entries; $right_entries)
-    | map(select(.left != null and .right != null))
-    ;
-
-def innerjoin($right_entries):
-    # Equivalent to `. as $left_entries | innerjoin($left_entries; $right_entries)`.
-    . as $left_entries
-    | innerjoin($left_entries; $right_entries)
-    ;
-
-
-def semijoin($left_entries; $right_entries):
+def left_semijoin($left_entries; $right_entries):
     # Performs a SQL-style left semi join between $left_entries and $right_entries
     # on <left-entry>.key == <right-entry>.key.
     # 
@@ -210,20 +190,20 @@ def semijoin($left_entries; $right_entries):
     # :param $left_entries:  [ { "key": <left-key>, "value": <left-value> }* ]
     # :param $right_entries:  [ { "key": <right-key>, "value": <right-value> }* ]
     # :output:  [ <left-value>* ] 
-    leftjoin($left_entries; $right_entries)
+    left_join($left_entries; $right_entries)
     | map(
         select(.right != null)
         | .left
     ) ;
 
-def semijoin($right_entries):
-    # Equivalent to `. as $left_entries | semijoin($left_entries; $right_entries)`.
+def left_semijoin($right_entries):
+    # Equivalent to `. as $left_entries | left_semijoin($left_entries; $right_entries)`.
     . as $left_entries
-    | semijoin($left_entries; $right_entries)
+    | left_semijoin($left_entries; $right_entries)
     ;
 
 
-def antijoin($left_entries; $right_entries):
+def left_antijoin($left_entries; $right_entries):
     # Performs a SQL-style left anti join between $left_entries and $right_entries
     # on <left-entry>.key == <right-entry>.key.
     # 
@@ -242,16 +222,36 @@ def antijoin($left_entries; $right_entries):
     # :param $left_entries:  [ { "key": <left-key>, "value": <left-value> }* ]
     # :param $right_entries:  [ { "key": <right-key>, "value": <right-value> }* ]
     # :output:  [ <left-value>* ]
-    leftjoin($left_entries; $right_entries)
+    left_join($left_entries; $right_entries)
     | map(
         select(.right == null)
         | .left
     ) ;
 
-def antijoin($right_entries):
-    # Equivalent to `. as $left_entries | antijoin($left_entries; $right_entries)`.
+def left_antijoin($right_entries):
+    # Equivalent to `. as $left_entries | left_antijoin($left_entries; $right_entries)`.
     . as $left_entries
-    | antijoin($left_entries; $right_entries)
+    | left_antijoin($left_entries; $right_entries)
+    ;
+
+
+def inner_join($left_entries; $right_entries):
+    # Performs a SQL-style inner join between $left_entries and $right_entries
+    # on <left-entry>.key == <right-entry>.key.
+    # 
+    # Uses `null == null` as in jq, *not* `NULL <> NULL` as in SQL.
+    # 
+    # :param $left_entries:  [ { "key": <left-key>, "value": <left-value> }* ]
+    # :param $right_entries:  [ { "key": <right-key>, "value": <right-value> }* ]
+    # :output:  [ { "key": <key>, "left": <left-value>, "right": <right-value> }* ]
+    full_join($left_entries; $right_entries)
+    | map(select(.left != null and .right != null))
+    ;
+
+def inner_join($right_entries):
+    # Equivalent to `. as $left_entries | inner_join($left_entries; $right_entries)`.
+    . as $left_entries
+    | inner_join($left_entries; $right_entries)
     ;
 
 
@@ -322,7 +322,7 @@ def intersect($right_values):
 
 # TODO document except_all(...)
 def except_all($left_values; $right_values):
-    antijoin($left_values|by(.); $right_values|by(.));
+    left_antijoin($left_values|by(.); $right_values|by(.));
 
 def except_all($right_values):
     except_all(.; $right_values);
