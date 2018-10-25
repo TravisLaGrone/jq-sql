@@ -235,6 +235,27 @@ def left_antijoin($right_entries):
     ;
 
 
+def right_join($left_entries; $right_entries):
+    left_join($right_entries; $left_entries);
+
+def right_join($right_entries):
+    . as $left_entries | right_join($left_entries; $right_entries);
+
+
+def right_semijoin($left_entries; $right_entries):
+    left_semijoin($right_entries; $left_entries);
+
+def right_semijoin($right_entries):
+    . as $left_entries | right_semijoin($left_entries; $right_entries);
+
+
+def right_antijoin($left_entries; $right_entries):
+    left_antijoin($right_entries; $left_entries);
+
+def right_antijoin($right_entries):
+    . as $left_entries | right_antijoin($left_entries; $right_entries);
+
+
 def inner_join($left_entries; $right_entries):
     # Performs a SQL-style inner join between $left_entries and $right_entries
     # on <left-entry>.key == <right-entry>.key.
