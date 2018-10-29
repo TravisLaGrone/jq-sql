@@ -24,7 +24,7 @@ def cross_join($left_values; $right_values):
     ] ;
 
 def cross_join($right_values):
-    # Equivalent to `. as $left_values | cross($left_values; $right_values)`.
+    # Equivalent to `. as $left_values | cross_join($left_values; $right_values)`.
     . as $left_values
     | cross_join($left_values; $right_values)
     ;
@@ -96,7 +96,7 @@ def full_join($left_entries; $right_entries):
                 "left": .left[]
             }
         else
-            cross(.left; .right)
+            cross_join(.left; .right)
             | .[]
             | .key = $key
         end
