@@ -2,8 +2,7 @@ module {
     "name": "sql",
     "description": "SQL-like operations (e.g. joins)",
     "author": "Travis C. LaGrone",
-    "email": "travis.lagrone@trintech.com",
-    "company": "Trintech"
+    "email": "LaGrone.T@gmail.com"
 };
 
 
